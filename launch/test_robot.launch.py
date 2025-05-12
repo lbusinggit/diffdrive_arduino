@@ -26,7 +26,7 @@ def generate_launch_description():
 
     # Get URDF via xacro
     robot_description_path = os.path.join(
-        get_package_share_directory('diffdrive_arduino'),
+        get_package_share_directory('bot_pkg1'),
         'description',
         'robot.urdf')
     robot_description_config = xacro.process_file(robot_description_path)
