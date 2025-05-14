@@ -18,7 +18,7 @@ struct Config
   float loop_rate = 30;
 
   // Serial port name to connect to Arduino (Linux device path)
-  std::string device = "/dev/ttyUSB0";
+  std::string device = "/dev/serial/by-path/platform-fd500000.pcie-pci-0000:01:00.0-usb-0:1.3.3:1.0-port0";
 
   // Baud rate for serial communication
   int baud_rate = 57600;
