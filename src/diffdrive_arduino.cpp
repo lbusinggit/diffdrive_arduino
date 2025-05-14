@@ -19,6 +19,12 @@ return_type DiffDriveArduino::configure(const hardware_interface::HardwareInfo &
   cfg_.timeout = std::stoi(info_.hardware_parameters["timeout"]);
   cfg_.enc_counts_per_rev = std::stoi(info_.hardware_parameters["enc_counts_per_rev"]);
 
+  cfg_.left_front_wheel_name = info_.hardware_parameters["left_front_wheel_name"];
+  cfg_.left_back_wheel_name = info_.hardware_parameters["left_back_wheel_name"];
+  cfg_.right_front_wheel_name = info_.hardware_parameters["right_front_wheel_name"];
+  cfg_.right_back_wheel_name = info_.hardware_parameters["right_back_wheel_name"];
+
+
   // Setup each wheel
   lf_wheel_.setup(cfg_.left_front_wheel_name, cfg_.enc_counts_per_rev);
   lb_wheel_.setup(cfg_.left_back_wheel_name, cfg_.enc_counts_per_rev);
@@ -104,17 +110,25 @@ hardware_interface::return_type DiffDriveArduino::read() {
 hardware_interface::return_type DiffDriveArduino::write() {
   if (!arduino_.connected()) return return_type::ERROR;
 
-  // Convert each individual wheel command into encoder ticks per loop
-  int lf_cmd_ticks = lf_wheel_.cmd / lf_wheel_.rads_per_count / cfg_.loop_rate;
-  int lb_cmd_ticks = lb_wheel_.cmd / lb_wheel_.rads_per_count / cfg_.loop_rate;
-  int rf_cmd_ticks = rf_wheel_.cmd / rf_wheel_.rads_per_count / cfg_.loop_rate;
-  int rb_cmd_ticks = rb_wheel_.cmd / rb_wheel_.rads_per_count / cfg_.loop_rate;
+  // Compute average left and right wheel commands
+  double left_cmd_avg = (lf_wheel_.cmd + lb_wheel_.cmd) / 2.0;
+  double right_cmd_avg = (rf_wheel_.cmd + rb_wheel_.cmd) / 2.0;
 
-  // Send all four commands to Arduino
-  arduino_.setMotorValues(lf_cmd_ticks, lb_cmd_ticks, rf_cmd_ticks, rb_cmd_ticks);
+  // Convert to encoder ticks per loop iteration
+  int left_cmd_ticks = static_cast<int>(left_cmd_avg / lf_wheel_.rads_per_count / cfg_.loop_rate);
+  int right_cmd_ticks = static_cast<int>(right_cmd_avg / rf_wheel_.rads_per_count / cfg_.loop_rate);
+
+  // Send the same command to both motors on each side
+  arduino_.setMotorValues(
+    left_cmd_ticks,  // Left Front
+    left_cmd_ticks,  // Left Back
+    right_cmd_ticks, // Right Front
+    right_cmd_ticks  // Right Back
+  );
 
   return return_type::OK;
 }
+
 
 
 // Plugin export
