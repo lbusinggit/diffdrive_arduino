@@ -6,6 +6,7 @@ if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
+
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra)
 endif()
@@ -16,6 +17,11 @@ find_package(hardware_interface REQUIRED)
 find_package(controller_manager REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(pluginlib REQUIRED)
+
+
+
+
+
 
 add_library(diffdrive_arduino SHARED src/diffdrive_arduino.cpp src/wheel.cpp src/arduino_comms.cpp)
 
@@ -33,8 +39,9 @@ ament_target_dependencies(
   pluginlib
 )
 
-# ✅ Update plugin file name here
-pluginlib_export_plugin_description_file(hardware_interface diffdrive_arduino_plugin.xml)
+pluginlib_export_plugin_description_file(hardware_interface robot_hardware.xml)
+
+
 
 add_library(fake_robot SHARED src/fake_robot.cpp src/wheel.cpp)
 set_property(TARGET fake_robot PROPERTY POSITION_INDEPENDENT_CODE ON)
@@ -54,15 +61,22 @@ ament_target_dependencies(
 
 pluginlib_export_plugin_description_file(hardware_interface fake_robot_hardware.xml)
 
+
+
+
 install(
   TARGETS diffdrive_arduino fake_robot
   DESTINATION lib
 )
 
+
+
+
 install(
   DIRECTORY controllers launch/
   DESTINATION share/${PROJECT_NAME}
 )
+
 
 ament_export_libraries(
   diffdrive_arduino
