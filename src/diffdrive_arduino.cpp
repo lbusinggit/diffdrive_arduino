@@ -133,5 +133,6 @@ hardware_interface::return_type DiffDriveArduino::write() {
 
 // Plugin export
 #include "pluginlib/class_list_macros.hpp"
-PLUGINLIB_EXPORT_CLASS(diffdrive_arduino::DiffDriveArduino, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(DiffDriveArduino, hardware_interface::SystemInterface)
+
 
